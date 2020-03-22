@@ -1,7 +1,6 @@
-package eu.righettod.pstdigger;
+package de.mapaco.pstdigger;
 
-import java.io.File;
-
+import de.mapaco.pstdigger.model.ParseResponse;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
@@ -9,13 +8,14 @@ import org.kohsuke.args4j.OptionHandlerFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+
 /**
  * Program entry point
- *
  */
-public class EntryPoint {
+public class OutlookParser {
 
-	private static final Logger LOG = LoggerFactory.getLogger(EntryPoint.class);
+	private static final Logger LOG = LoggerFactory.getLogger(OutlookParser.class);
 
 	@Option(name = "-i", usage = "Perform search of terms in case sensitive way", required = false)
 	private boolean caseSensitive = false;
@@ -38,19 +38,20 @@ public class EntryPoint {
 	 * @param args Command line
 	 */
 	public static void main(String[] args) {
-		new EntryPoint().doMain(args);
+		new OutlookParser().analysePst(args);
 	}
 
 	/**
 	 * Perform the job
-	 * 
+	 *
 	 * @param args Command line
 	 */
 	@SuppressWarnings("boxing")
-	private void doMain(String[] args) {
+	private void analysePst(String[] args) {
 		CmdLineParser parser = new CmdLineParser(this);
 		try {
 			// Parse the arguments
+			// todo: was sind die 120 ?
 			parser.getProperties().withUsageWidth(120);
 			parser.parseArgument(args);
 
@@ -61,10 +62,9 @@ public class EntryPoint {
 
 			// Dig the file
 			LOG.info("Start digging on file '{}' ...", this.pst);
-			int count = new Digger(this.caseSensitive, this.searchedKeywords, this.pst, this.output, this.dumpAttachments).dig();
-			LOG.info("Digging finished, {} interesting mails found, see folder '{}' for details !", count, this.output.getAbsolutePath());
-		}
-		catch (CmdLineException cmde) {
+			ParseResponse response = new PstProcessor(this.caseSensitive, this.searchedKeywords, this.pst, this.output, this.dumpAttachments).findEmails();
+			LOG.info("Digging finished, {} interesting mails found, see folder '{}' for details !", response.getEmailCount(), this.output.getAbsolutePath());
+		} catch (CmdLineException cmde) {
 			LOG.error("Bad syntax !");
 			LOG.error(" ");
 			LOG.error("Usage:");

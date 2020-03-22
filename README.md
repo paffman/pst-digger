@@ -3,8 +3,7 @@
 
 # Description
 
-Program to analyze mails stored into a Microsoft Outlook PST file and find one based on search keywords.
-There no need of Microsoft Outlook on the target computer.
+Program to read Messages from an Outlook PST File and persisting them in a SQLLite DB. 
 
 This project is implemented using Maven (v3.x) structure.
 
